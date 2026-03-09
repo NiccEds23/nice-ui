@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Wrong lockfiles (this project uses pnpm — pnpm-lock.yaml is the correct lockfile)
+package-lock.json
+yarn.lock
+
