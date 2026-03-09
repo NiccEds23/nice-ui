@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watchEffect } from "vue";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { BarChart } from "echarts/charts";
@@ -19,11 +19,10 @@ import {
   TitleComponent,
   DataZoomComponent,
 } from "echarts/components";
-import { Bar3DChart } from "echarts-gl/charts";
-import { Grid3DComponent } from "echarts-gl/components";
 import BaseChart from "./BaseChart.vue";
 import { useChartData } from "@/composables/useChartData";
 
+// Register 2D ECharts components — always needed, lightweight
 use([
   CanvasRenderer,
   BarChart,
@@ -32,8 +31,6 @@ use([
   LegendComponent,
   TitleComponent,
   DataZoomComponent,
-  Bar3DChart,
-  Grid3DComponent,
 ]);
 
 const props = defineProps<{
@@ -46,6 +43,17 @@ const props = defineProps<{
   width?: string;
   loading?: boolean;
 }>();
+
+// echarts-gl (~2.5MB) is loaded on demand only when is3d=true — keeps initial bundle lean
+watchEffect(async () => {
+  if (props.is3d) {
+    const [{ Bar3DChart }, { Grid3DComponent }] = await Promise.all([
+      import("echarts-gl/charts"),
+      import("echarts-gl/components"),
+    ]);
+    use([Bar3DChart, Grid3DComponent]);
+  }
+});
 
 const { categories, series } = useChartData(props);
 
@@ -72,31 +80,15 @@ const chartOptions = computed(() => {
           ],
         },
       },
-      xAxis3D: {
-        type: "category",
-        data: categories.value,
-      },
-      yAxis3D: {
-        type: "category",
-        data: series.value.map((s) => s.name),
-      },
-      zAxis3D: {
-        type: "value",
-      },
+      xAxis3D: { type: "category", data: categories.value },
+      yAxis3D: { type: "category", data: series.value.map((s) => s.name) },
+      zAxis3D: { type: "value" },
       grid3D: {
         boxWidth: 200,
         boxDepth: 80,
-        viewControl: {
-          // projection: 'orthographic'
-        },
         light: {
-          main: {
-            intensity: 1.2,
-            shadow: true,
-          },
-          ambient: {
-            intensity: 0.3,
-          },
+          main: { intensity: 1.2, shadow: true },
+          ambient: { intensity: 0.3 },
         },
       },
       series: series.value.map((s, index) => ({
@@ -121,9 +113,7 @@ const chartOptions = computed(() => {
     yAxis: {
       type: "value",
       axisLabel: { color: "var(--text-secondary)" },
-      splitLine: {
-        lineStyle: { type: "dashed", color: "var(--chart-grid)" },
-      },
+      splitLine: { lineStyle: { type: "dashed", color: "var(--chart-grid)" } },
       nameTextStyle: { color: "var(--text-secondary)" },
     },
     series: series.value.map((s) => ({

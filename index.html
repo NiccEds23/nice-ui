@@ -4,7 +4,30 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>NiceUI</title>
+
+    <!-- Font preconnect — must come before stylesheet links to reduce DNS latency -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!--
+      Plus Jakarta Sans — body text font.
+      Pinned weight range 200-700. display=swap prevents FOIT.
+    -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700&display=swap"
+    />
+
+    <!--
+      Material Symbols Outlined — icon font.
+      Pinned to exact axes: wght=400, FILL=0 only.
+      This avoids downloading the full variable font range (~500KB saved).
+    -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
   </head>
   <body>
     <div id="app"></div>
