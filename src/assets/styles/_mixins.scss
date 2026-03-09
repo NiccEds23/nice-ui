@@ -1,0 +1,42 @@
+@use "variables" as *;
+@use "sass:color";
+
+@mixin glass-panel {
+  background: $panel-gradient;
+  backdrop-filter: blur($glass-blur) saturate(180%);
+  -webkit-backdrop-filter: blur($glass-blur) saturate(180%);
+  border: 1px solid $glass-border;
+  box-shadow: $glass-shadow;
+}
+
+@mixin glass-card {
+  background: $card-gradient;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 85, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: $card-hover-gradient;
+    border-color: #e0e7ff;
+    box-shadow: 0 10px 40px rgba(0, 85, 255, 0.12);
+    transform: translateY(-2px);
+  }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin text-gradient-primary {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, $primary-color, black 10%) 0%,
+    color-mix(in srgb, $primary-color, white 10%) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

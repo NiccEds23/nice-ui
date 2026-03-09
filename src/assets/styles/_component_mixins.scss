@@ -1,0 +1,443 @@
+@use "variables" as *;
+
+// Modal Mixins
+@mixin glass-modal {
+  background: rgba(
+    255,
+    255,
+    255,
+    0.75
+  ); // Keep legacy fallback or update to vars? Let's keep strict glass
+  // Actually, use surface-glass-heavy from vars if possible, but the original was hardcoded.
+  // Let's stick to the theme variables for consistency in dark mode.
+  background: var(--surface-glass-heavy);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid var(--border-glass);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1); // Adjusted inner shadow color for dark mode compat
+  border-radius: 2.5rem;
+}
+
+@mixin modal-overlay {
+  background: rgba($neutral-900-rgb, 0.1);
+  backdrop-filter: blur(6px);
+}
+
+// Button Mixins
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: 1px solid transparent; // Default transparent border
+  outline: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Filled Variants
+@mixin btn-primary {
+  background: $primary-color;
+  color: $text-inverted;
+  border-color: transparent;
+  box-shadow: 0 4px 6px -1px rgba($primary-rgb, 0.3);
+
+  &:hover:not(:disabled) {
+    background: $primary-hover;
+    box-shadow: 0 10px 15px -3px rgba($primary-rgb, 0.4);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+@mixin btn-secondary {
+  background: $secondary-color;
+  color: $text-inverted;
+  border-color: transparent;
+  box-shadow: 0 4px 6px -1px rgba($secondary-rgb, 0.3);
+
+  &:hover:not(:disabled) {
+    background: $secondary-hover;
+    box-shadow: 0 10px 15px -3px rgba($secondary-rgb, 0.4);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+@mixin btn-success {
+  background: $status-success;
+  color: $text-inverted;
+  border-color: transparent;
+  box-shadow: 0 4px 6px -1px rgba($status-success-rgb, 0.3);
+
+  &:hover:not(:disabled) {
+    background: $status-success-hover;
+    box-shadow: 0 10px 15px -3px rgba($status-success-rgb, 0.4);
+    transform: translateY(-1px);
+  }
+}
+
+@mixin btn-danger {
+  background: rgba($status-danger-rgb, 0.1);
+  color: $status-danger;
+  border-color: transparent;
+
+  &:hover:not(:disabled) {
+    background: rgba($status-danger-rgb, 0.2);
+  }
+}
+
+@mixin btn-ghost {
+  background: transparent;
+  color: $text-secondary;
+  border-color: transparent;
+
+  &:hover:not(:disabled) {
+    background: rgba($neutral-100-rgb, 0.5);
+    color: $neutral-700;
+  }
+}
+
+// Outlined Variants
+@mixin btn-outlined($color-value) {
+  background: transparent;
+  color: $color-value;
+  border: 1px solid $color-value;
+  box-shadow: none;
+
+  &:hover:not(:disabled) {
+    // Use color-mix for dynamic opacity with CSS variables
+    background: color-mix(in srgb, #{$color-value}, transparent 90%);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Input Mixins
+@mixin input-base {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.7); // Consider var(--surface-glass)?
+  // Let's stick to explicit rgba for now or replace with var(--surface-glass-heavy) if appropriate
+  // Ideally inputs in dark mode should be dark.
+  background: var(--surface-glass);
+
+  border: 1px solid rgba($neutral-300-rgb, 0.6);
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: $text-primary;
+  transition: all 0.2s;
+  outline: none;
+
+  &:focus {
+    background: var(
+      --surface-white
+    ); // was rgba(white, 0.95), surface-white handles this
+    border-color: rgba($primary-rgb, 0.6);
+    box-shadow: 0 0 0 4px rgba($primary-rgb, 0.1);
+  }
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &.has-error {
+    border-color: $status-danger;
+
+    &:focus {
+      box-shadow: 0 0 0 4px rgba($status-danger-rgb, 0.1);
+    }
+  }
+}
+
+.hint-text {
+  font-size: 0.75rem;
+  color: $text-muted;
+  margin-left: 0.25rem;
+}
+
+// Table Mixins
+@mixin table-container {
+  border-radius: 2rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  // background: linear-gradient... needs update
+  background: var(--panel-gradient);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--glass-shadow);
+}
+
+@mixin table-header-cell {
+  padding: 1.25rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $text-secondary;
+  background: rgba(
+    $neutral-50-rgb,
+    0.3
+  ); // Replaced white 0.3 with neutral-50 for dark mode compat? Or keep white?
+  // In dark mode, neutral-50 is neutral-900 (black). So this becomes black 0.3. Correct.
+  border-bottom: 1px solid rgba($neutral-200-rgb, 0.5);
+  white-space: nowrap;
+}
+
+@mixin table-row-hover {
+  transition: all 0.2s ease;
+
+  &:hover {
+    * {
+      transform: scale(1.002);
+    }
+
+    background-color: rgba($neutral-50-rgb, 0.6); // Adapt to dark mode
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    z-index: 10;
+    position: relative;
+  }
+}
+
+@mixin search-input-glass {
+  width: 100%;
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glass);
+  border-radius: 1rem;
+  padding: 0.625rem 1rem 0.625rem 3rem;
+  font-size: 0.875rem;
+  color: $neutral-700; // Maybe text-primary?
+  transition: all 0.2s;
+  outline: none;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  &:focus {
+    background: var(--surface-glass-heavy);
+    border-color: rgba($primary-rgb, 0.3);
+    box-shadow: 0 0 0 2px rgba($primary-rgb, 0.2);
+  }
+
+  &::placeholder {
+    color: $text-muted;
+  }
+}
+
+@mixin pagination-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+
+  &.active {
+    background: $primary-hover;
+    color: $text-inverted;
+    box-shadow: 0 4px 6px -1px rgba($primary-rgb, 0.2);
+  }
+
+  &:not(.active) {
+    background: var(--surface-glass);
+    color: $text-secondary;
+    border-color: var(--border-glass);
+
+    &:hover:not(:disabled) {
+      background: var(--surface-white);
+      color: $text-primary;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+@mixin status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(4px);
+
+  &.status-active {
+    background: rgba($status-success-rgb, 0.1);
+    // color: color-mix(in srgb, $status-success, black 20%);
+    // Use the hover/darker variant for text
+    color: $status-success-hover;
+    border: 1px solid rgba($status-success-rgb, 0.3);
+
+    .dot {
+      background: $status-success;
+    }
+  }
+
+  &.status-warning {
+    background: rgba($status-warning-rgb, 0.1);
+    color: $status-warning-hover;
+    border: 1px solid rgba($status-warning-rgb, 0.3);
+
+    .dot {
+      background: $status-warning;
+    }
+  }
+
+  &.status-danger {
+    background: rgba($status-danger-rgb, 0.1);
+    color: $status-danger;
+    border: 1px solid rgba($status-danger-rgb, 0.3);
+
+    .dot {
+      background: $status-danger;
+    }
+  }
+
+  &.status-neutral {
+    background: rgba($neutral-100-rgb, 0.5);
+    color: $text-secondary;
+    border: 1px solid rgba($neutral-200-rgb, 0.5);
+
+    .dot {
+      background: $text-muted;
+    }
+  }
+
+  .dot {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+  }
+}
+
+// Select Mixins
+@mixin select-base {
+  @include input-base;
+  appearance: none;
+  // URL-encoded SVG color handling is tricky with CSS vars.
+  // Ideally replace with a mask or real icon, but for now we keep as is.
+  // The previous color was #64748b (neutral-500).
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='%2364748b'%3E%3Cpath d='M480-360 280-560h400L480-360Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+// Switch Mixins
+@mixin switch-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+@mixin switch-track {
+  width: 2.75rem;
+  height: 1.5rem;
+  background-color: $neutral-300;
+  border-radius: 9999px; // full
+  position: relative;
+  transition: background-color 0.2s ease-in-out;
+  border: 1px solid var(--border-glass);
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+  &.checked {
+    background-color: $primary-hover;
+  }
+}
+
+@mixin switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1.25rem;
+  height: 1.25rem;
+  background-color: white; // keep white for thumb usually
+  border-radius: 50%;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+
+  &.checked {
+    transform: translateX(1.25rem); // translate-x-5
+  }
+}
+
+// Upload Mixins
+@mixin upload-area {
+  border: 2px dashed $neutral-300;
+  border-radius: 1.5rem;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface-glass);
+  backdrop-filter: blur(4px);
+
+  &:hover {
+    border-color: $text-muted;
+    background: var(--surface-glass-heavy);
+  }
+
+  &.drag-active {
+    border-color: $primary-color;
+    background: rgba($primary-rgb, 0.1);
+  }
+}
+
+// Tooltip Mixins
+@mixin tooltip-base {
+  position: absolute;
+  z-index: 50;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $text-inverted;
+  background: rgba($neutral-900-rgb, 0.85); // Dark semi-transparent
+  backdrop-filter: blur(8px);
+  border-radius: 0.5rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  pointer-events: none; // Prevent tooltip from blocking clicks
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+}

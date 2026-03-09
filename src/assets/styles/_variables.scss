@@ -1,0 +1,84 @@
+// Brand Colors
+$primary-color: var(--primary-color);
+$primary-rgb: var(--primary-rgb);
+$primary-200: var(--primary-200);
+$primary-hover: var(--primary-hover);
+$secondary-color: var(--secondary-color);
+$secondary-rgb: var(--secondary-rgb);
+$secondary-hover: var(--secondary-hover);
+$accent-color: var(--accent-color);
+
+// Semantic Colors
+$status-success: var(--status-success);
+$status-success-rgb: var(--status-success-rgb);
+$status-success-hover: var(--status-success-hover);
+
+$status-warning: var(--status-warning);
+$status-warning-rgb: var(--status-warning-rgb);
+$status-warning-hover: var(--status-warning-hover);
+
+$status-danger: var(--status-danger);
+$status-danger-rgb: var(--status-danger-rgb);
+$status-danger-hover: var(--status-danger-hover);
+
+$status-info: var(--status-info);
+$status-info-rgb: var(--status-info-rgb);
+
+// Neutral Scale
+$neutral-50: var(--neutral-50);
+$neutral-50-rgb: var(--neutral-50-rgb);
+$neutral-100: var(--neutral-100);
+$neutral-100-rgb: var(--neutral-100-rgb);
+$neutral-200: var(--neutral-200);
+$neutral-200-rgb: var(--neutral-200-rgb);
+$neutral-300: var(--neutral-300);
+$neutral-300-rgb: var(--neutral-300-rgb);
+$neutral-400: var(--neutral-400);
+$neutral-400-rgb: var(--neutral-400-rgb);
+$neutral-500: var(--neutral-500);
+$neutral-500-rgb: var(--neutral-500-rgb);
+$neutral-600: var(--neutral-600);
+$neutral-600-rgb: var(--neutral-600-rgb);
+$neutral-700: var(--neutral-700);
+$neutral-700-rgb: var(--neutral-700-rgb);
+$neutral-800: var(--neutral-800);
+$neutral-800-rgb: var(--neutral-800-rgb);
+$neutral-900: var(--neutral-900);
+$neutral-900-rgb: var(--neutral-900-rgb);
+
+// Text Colors
+$text-primary: var(--text-primary);
+$text-secondary: var(--text-secondary);
+$text-muted: var(--text-muted);
+$text-inverted: var(--text-inverted);
+
+// Surface & UI
+$bg-light: var(--bg-light);
+$surface-white: var(--surface-white);
+$surface-glass: var(--surface-glass);
+$surface-glass-heavy: var(--surface-glass-heavy);
+$border-glass: var(--border-glass);
+$border-light: var(--border-light);
+
+// Gradients
+$bg-gradient: var(--bg-gradient);
+$primary-gradient: linear-gradient(
+  135deg,
+  var(--primary-color) 0%,
+  var(--secondary-color) 100%
+);
+$card-gradient: var(--card-gradient);
+$panel-gradient: var(--panel-gradient);
+$card-hover-gradient: var(--card-hover-gradient);
+
+// Status Backgrounds (Highlights etc)
+$highlight-bg: var(--highlight-bg);
+$highlight-text: var(--highlight-text);
+
+// Fonts
+$font-family-base: "Plus Jakarta Sans", sans-serif;
+
+// Glass Tokens
+$glass-border: var(--border-glass);
+$glass-shadow: var(--glass-shadow);
+$glass-blur: 20px;

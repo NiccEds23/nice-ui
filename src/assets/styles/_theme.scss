@@ -1,0 +1,185 @@
+:root {
+  /* Brand Colors */
+  --primary-color: #3b82f6;
+  --primary-rgb: 59, 130, 246;
+  --primary-200: #bfdbfe;
+  --primary-hover: #2563eb;
+  --secondary-color: #06b6d4;
+  --secondary-rgb: 6, 182, 212;
+  --secondary-hover: #0891b2; /* Cyan 600 */
+  --accent-color: #8b5cf6;
+
+  /* Semantic Colors */
+  --status-success: #22c55e;
+  --status-success-rgb: 34, 197, 94;
+  --status-success-hover: #16a34a; /* Green 600 */
+  --status-warning: #f59e0b;
+  --status-warning-rgb: 245, 158, 11;
+  --status-warning-hover: #d97706; /* Amber 600 */
+  --status-danger: #ef4444;
+  --status-danger-rgb: 239, 68, 68;
+  --status-danger-hover: #dc2626; /* Red 600 */
+  --status-info: #3b82f6;
+  --status-info-rgb: 59, 130, 246;
+
+  /* Neutral Scale */
+  --neutral-50: #f8fafc;
+  --neutral-50-rgb: 248, 250, 252;
+  --neutral-100: #f1f5f9;
+  --neutral-100-rgb: 241, 245, 249;
+  --neutral-200: #e2e8f0;
+  --neutral-200-rgb: 226, 232, 240;
+  --neutral-300: #cbd5e1;
+  --neutral-300-rgb: 203, 213, 225;
+  --neutral-400: #94a3b8;
+  --neutral-400-rgb: 148, 163, 184;
+  --neutral-500: #64748b;
+  --neutral-500-rgb: 100, 116, 139;
+  --neutral-600: #475569;
+  --neutral-600-rgb: 71, 85, 105;
+  --neutral-700: #334155;
+  --neutral-700-rgb: 51, 65, 85;
+  --neutral-800: #1e293b;
+  --neutral-800-rgb: 30, 41, 59;
+  --neutral-900: #0f172a;
+  --neutral-900-rgb: 15, 23, 42;
+
+  /* Text Colors */
+  --text-primary: #1e293b; /* neutral-800 */
+  --text-secondary: #64748b; /* neutral-500 */
+  --text-muted: #94a3b8; /* neutral-400 */
+  --text-inverted: #ffffff;
+
+  /* Surface & UI */
+  --bg-light: #f8fafc; /* neutral-50 */
+  --surface-white: #ffffff;
+  --surface-glass: rgba(255, 255, 255, 0.4);
+  --surface-glass-heavy: rgba(255, 255, 255, 0.8);
+  --border-glass: rgba(255, 255, 255, 0.5);
+  --border-light: #e2e8f0; /* neutral-200 */
+  --chart-grid: #e2e8f0; /* Match border-light in light mode */
+
+  /* Gradients */
+  --bg-gradient-start: #e0f2fe;
+  --bg-gradient-mid: #f0f9ff;
+  --bg-gradient-end: #eff6ff;
+  --bg-gradient: linear-gradient(
+    120deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
+
+  --card-gradient-start: rgba(255, 255, 255, 0.8);
+  --card-gradient-end: rgba(255, 255, 255, 0.5);
+  --card-gradient: linear-gradient(
+    135deg,
+    var(--card-gradient-start) 0%,
+    var(--card-gradient-end) 100%
+  );
+
+  --card-hover-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+
+  --panel-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+
+  /* Status Backgrounds */
+  --highlight-bg: rgba(250, 204, 21, 0.3);
+  --highlight-text: #854d0e;
+
+  /* Glass Tokens */
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
+}
+
+[data-theme="dark"] {
+  /* Brand Colors */
+  --primary-color: #60a5fa; /* Blue 400 */
+  --primary-rgb: 96, 165, 250;
+  --primary-200: #1e3a8a; /* Blue 900 */
+  --primary-hover: #3b82f6; /* Blue 500 */
+  --secondary-color: #22d3ee; /* Cyan 400 */
+  --secondary-rgb: 34, 211, 238;
+  --secondary-hover: #06b6d4; /* Cyan 500 */
+  --accent-color: #a78bfa; /* Violet 400 */
+
+  /* Semantic Colors (dark mode overrides) */
+  --status-success-hover: #4ade80; /* Green 400 - brighter in dark */
+  --status-warning-hover: #fbbf24; /* Amber 400 - brighter in dark */
+  --status-danger-hover: #f87171; /* Red 400 - brighter in dark */
+
+  /* Generic Inversions */
+  --neutral-50: #0f172a; /* neutral-900 */
+  --neutral-50-rgb: 15, 23, 42;
+  --neutral-100: #1e293b; /* neutral-800 */
+  --neutral-100-rgb: 30, 41, 59;
+  --neutral-200: #334155; /* neutral-700 */
+  --neutral-200-rgb: 51, 65, 85;
+  --neutral-300: #475569; /* neutral-600 */
+  --neutral-300-rgb: 71, 85, 105;
+  --neutral-400: #94a3b8; /* neutral-400 (stays) */
+  --neutral-400-rgb: 148, 163, 184;
+  --neutral-500: #cbd5e1; /* neutral-300 */
+  --neutral-500-rgb: 203, 213, 225;
+  --neutral-600: #e2e8f0; /* neutral-200 */
+  --neutral-600-rgb: 226, 232, 240;
+  --neutral-700: #f1f5f9; /* neutral-100 */
+  --neutral-700-rgb: 241, 245, 249;
+  --neutral-800: #f8fafc; /* neutral-50 */
+  --neutral-800-rgb: 248, 250, 252;
+  --neutral-900: #ffffff;
+  --neutral-900-rgb: 255, 255, 255;
+
+  /* Text Colors */
+  --text-primary: #f1f5f9; /* neutral-100 */
+  --text-secondary: #94a3b8; /* neutral-400 */
+  --text-muted: #64748b; /* neutral-500 */
+  --text-inverted: #0f172a; /* neutral-900 (black-ish) */
+
+  /* Surface & UI */
+  --bg-light: #0f172a; /* neutral-900 */
+  --surface-white: #1e293b; /* neutral-800 - Used for cards base */
+  --surface-glass: rgba(30, 41, 59, 0.6); /* Dark glass */
+  --surface-glass-heavy: rgba(30, 41, 59, 0.9);
+  --border-glass: rgba(255, 255, 255, 0.1);
+  --border-light: #334155; /* neutral-700 */
+  --chart-grid: rgba(
+    255,
+    255,
+    255,
+    0.1
+  ); /* Explicit white opacity for dark mode charts */
+
+  /* Gradients */
+  --bg-gradient-start: #0f172a;
+  --bg-gradient-mid: #1e293b;
+  --bg-gradient-end: #0f172a;
+
+  --card-gradient-start: rgba(30, 41, 59, 0.7);
+  --card-gradient-end: rgba(30, 41, 59, 0.4);
+
+  --card-hover-gradient: linear-gradient(
+    135deg,
+    rgba(30, 41, 59, 0.8) 0%,
+    rgba(30, 41, 59, 0.5) 100%
+  );
+
+  --panel-gradient: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.7) 0%,
+    rgba(15, 23, 42, 0.4) 100%
+  );
+
+  /* Status Backgrounds */
+  --highlight-bg: rgba(250, 204, 21, 0.15);
+  --highlight-text: #fde047; /* Yellow 300 */
+
+  /* Glass Tokens */
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="diagonalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+       <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+       <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.6" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect x="0" y="0" width="512" height="512" rx="120" ry="120" fill="url(#primaryGradient)" />
+  
+  <!-- Dynamic N Shape -->
+  <g transform="translate(116, 116)">
+    <!-- Left Pillar -->
+    <rect x="0" y="0" width="70" height="280" rx="35" fill="white" />
+    
+    <!-- Right Pillar -->
+    <rect x="210" y="0" width="70" height="280" rx="35" fill="white" />
+    
+    <!-- Diagonal Swoosh -->
+    <path d="M 35 40 L 245 240" stroke="url(#diagonalGradient)" stroke-width="70" stroke-linecap="round" />
+  </g>
+</svg>

@@ -1,0 +1,134 @@
+@use '@/assets/styles/variables' as *;
+
+// Backgrounds
+.bg-white {
+    background-color: $surface-white !important;
+}
+
+.bg-light {
+    background-color: $bg-light !important;
+}
+
+.bg-transparent {
+    background-color: transparent !important;
+}
+
+// Borders
+$sides: (
+    't': 'top',
+    'b': 'bottom',
+    'l': 'left',
+    'r': 'right'
+);
+
+.border {
+    border: 1px solid !important;
+}
+
+@each $key, $side in $sides {
+    .border-#{$key} {
+        border-#{$side}: 1px solid !important;
+    }
+}
+
+@each $size in 0, 1, 2, 4, 8 {
+    .border-#{$size} {
+        border-width: #{$size}px !important;
+        border-style: solid !important;
+    }
+
+    @each $key, $side in $sides {
+        .border-#{$key}-#{$size} {
+            border-#{$side}-width: #{$size}px !important;
+            border-#{$side}-style: solid !important;
+        }
+    }
+}
+
+// Border Colors
+.border-light {
+    border-color: $border-light !important;
+}
+
+.border-glass {
+    border-color: $border-glass !important;
+}
+
+.border-primary {
+    border-color: $primary-color !important;
+}
+
+.border-secondary {
+    border-color: $secondary-color !important;
+}
+
+.border-success {
+    border-color: $status-success !important;
+}
+
+.border-danger {
+    border-color: $status-danger !important;
+}
+
+.border-warning {
+    border-color: $status-warning !important;
+}
+
+.border-info {
+    border-color: $status-info !important;
+}
+
+// Radius
+.rounded {
+    border-radius: 0.25rem !important;
+}
+
+.rounded-md {
+    border-radius: 0.375rem !important;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem !important;
+}
+
+.rounded-xl {
+    border-radius: 0.75rem !important;
+}
+
+.rounded-2xl {
+    border-radius: 1rem !important;
+}
+
+.rounded-full {
+    border-radius: 9999px !important;
+}
+
+// Shadows
+.shadow-sm {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+.shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+// Opacity
+.opacity-50 {
+    opacity: 0.5 !important;
+}
+
+.opacity-75 {
+    opacity: 0.75 !important;
+}
+
+.opacity-100 {
+    opacity: 1 !important;
+}

@@ -1,0 +1,140 @@
+@use 'sass:map';
+
+// Display
+$displays: (
+    'block': block,
+    'inline': inline,
+    'inline-block': inline-block,
+    'flex': flex,
+    'inline-flex': inline-flex,
+    'grid': grid,
+    'none': none
+);
+
+@each $name, $value in $displays {
+    .d-#{$name} {
+        display: $value !important;
+    }
+}
+
+// Flexbox
+.flex-row {
+    flex-direction: row !important;
+}
+
+.flex-row-reverse {
+    flex-direction: row-reverse !important;
+}
+
+.flex-col {
+    flex-direction: column !important;
+}
+
+.flex-col-reverse {
+    flex-direction: column-reverse !important;
+}
+
+.flex-wrap {
+    flex-wrap: wrap !important;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap !important;
+}
+
+.flex-1 {
+    flex: 1 1 0% !important;
+}
+
+.flex-auto {
+    flex: 1 1 auto !important;
+}
+
+.flex-none {
+    flex: none !important;
+}
+
+.grow {
+    flex-grow: 1 !important;
+}
+
+.grow-0 {
+    flex-grow: 0 !important;
+}
+
+.shrink {
+    flex-shrink: 1 !important;
+}
+
+.shrink-0 {
+    flex-shrink: 0 !important;
+}
+
+$justify: (
+    'start': flex-start,
+    'end': flex-end,
+    'center': center,
+    'between': space-between,
+    'around': space-around,
+    'evenly': space-evenly
+);
+
+@each $name, $value in $justify {
+    .justify-#{$name} {
+        justify-content: $value !important;
+    }
+}
+
+$items: (
+    'start': flex-start,
+    'end': flex-end,
+    'center': center,
+    'baseline': baseline,
+    'stretch': stretch
+);
+
+@each $name, $value in $items {
+    .items-#{$name} {
+        align-items: $value !important;
+    }
+}
+
+// Gap
+@for $i from 0 through 12 {
+    .gap-#{$i} {
+        gap: #{$i * 0.25}rem !important; // 4px scale
+    }
+}
+
+// Positioning
+$positions: (
+    'static': static,
+    'fixed': fixed,
+    'absolute': absolute,
+    'relative': relative,
+    'sticky': sticky
+);
+
+@each $name, $value in $positions {
+    .#{$name} {
+        position: $value !important;
+    }
+}
+
+.inset-0 {
+    inset: 0 !important;
+}
+
+// Overflow
+$overflows: (
+    'auto': auto,
+    'hidden': hidden,
+    'visible': visible,
+    'scroll': scroll
+);
+
+@each $name, $value in $overflows {
+    .overflow-#{$name} {
+        overflow: $value !important;
+    }
+}
