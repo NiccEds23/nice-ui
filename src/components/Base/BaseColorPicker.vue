@@ -1,5 +1,9 @@
 <template>
-  <div class="base-color-picker" :class="{ 'picker-disabled': disabled }">
+  <div
+    class="base-color-picker"
+    :class="{ 'picker-disabled': disabled }"
+    ref="triggerRef"
+  >
     <label v-if="label" class="picker-label">{{ label }}</label>
 
     <!-- Preview + Hex Input Row -->
@@ -8,7 +12,7 @@
         class="color-swatch-trigger"
         :style="{ background: modelValue || '#6366f1' }"
         :disabled="disabled"
-        @click="panelOpen = !panelOpen"
+        @click="togglePanel"
         aria-label="Open color picker"
       />
       <input
@@ -22,15 +26,24 @@
       />
     </div>
 
-    <!-- Panel -->
+    <p v-if="hint" class="picker-hint">{{ hint }}</p>
+  </div>
+
+  <!-- ── Teleported Panel ─────────────────────────────────── -->
+  <Teleport to="body">
     <Transition name="color-panel">
-      <div v-if="panelOpen && !disabled" class="picker-panel">
+      <div
+        v-if="panelOpen && !disabled"
+        class="bcp-panel"
+        :style="panelStyle"
+        ref="panelRef"
+      >
         <!-- Presets grid -->
-        <div class="presets-grid">
+        <div class="bcp-presets-grid">
           <button
             v-for="color in allPresets"
             :key="color"
-            class="preset-swatch"
+            class="bcp-preset-swatch"
             :class="{ selected: modelValue === color }"
             :style="{ background: color }"
             :title="color"
@@ -39,10 +52,10 @@
         </div>
 
         <!-- Native color input -->
-        <div class="picker-native-row">
-          <label class="native-label">Custom</label>
+        <div class="bcp-native-row">
+          <label class="bcp-native-label">Custom</label>
           <input
-            class="native-input"
+            class="bcp-native-input"
             type="color"
             :value="modelValue || '#6366f1'"
             @input="onNativeInput"
@@ -50,13 +63,11 @@
         </div>
       </div>
     </Transition>
-
-    <p v-if="hint" class="picker-hint">{{ hint }}</p>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 
 const DEFAULT_PRESETS = [
   "#ef4444",
@@ -94,8 +105,42 @@ const emit = defineEmits<{
   "update:modelValue": [value: string];
 }>();
 
+// Two-root template (div + Teleport) — disable auto inheritAttrs
+defineOptions({ inheritAttrs: false });
+
 const panelOpen = ref(false);
+const triggerRef = ref<HTMLElement | null>(null);
+const panelRef = ref<HTMLElement | null>(null);
 const allPresets = props.presets?.length ? props.presets : DEFAULT_PRESETS;
+
+// Panel position computed from trigger's bounding rect
+const panelStyle = ref<Record<string, string>>({});
+
+function updatePosition() {
+  if (!triggerRef.value) return;
+  const rect = triggerRef.value.getBoundingClientRect();
+  const panelHeight = 220; // approximate
+  const panelWidth = 256;
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const dropUp = spaceBelow < panelHeight && rect.top > panelHeight;
+
+  panelStyle.value = {
+    position: "fixed",
+    left: `${Math.min(rect.left, window.innerWidth - panelWidth - 8)}px`,
+    top: dropUp ? `${rect.top - panelHeight - 8}px` : `${rect.bottom + 8}px`,
+    zIndex: "9999",
+    width: `${panelWidth}px`,
+  };
+}
+
+function togglePanel() {
+  if (panelOpen.value) {
+    panelOpen.value = false;
+  } else {
+    updatePosition();
+    panelOpen.value = true;
+  }
+}
 
 function selectColor(color: string) {
   emit("update:modelValue", color);
@@ -113,6 +158,32 @@ function onNativeInput(e: Event) {
   const val = (e.target as HTMLInputElement).value;
   emit("update:modelValue", val);
 }
+
+// Click-outside detection
+function handleClickOutside(e: MouseEvent) {
+  const target = e.target as Node;
+  if (panelRef.value?.contains(target) || triggerRef.value?.contains(target)) {
+    return;
+  }
+  panelOpen.value = false;
+}
+
+// Reposition on scroll/resize
+function handleReposition() {
+  if (panelOpen.value) updatePosition();
+}
+
+onMounted(() => {
+  document.addEventListener("mousedown", handleClickOutside);
+  window.addEventListener("scroll", handleReposition, true);
+  window.addEventListener("resize", handleReposition);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("mousedown", handleClickOutside);
+  window.removeEventListener("scroll", handleReposition, true);
+  window.removeEventListener("resize", handleReposition);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -176,11 +247,23 @@ function onNativeInput(e: Event) {
   }
 }
 
-.picker-panel {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  left: 0;
-  z-index: 200;
+.picker-hint {
+  font-size: 0.75rem;
+  color: $text-muted;
+  margin: 0;
+}
+
+.picker-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+</style>
+
+<!-- Non-scoped: styles for the teleported panel rendered on <body> -->
+<style lang="scss">
+@use "@/assets/styles/variables" as *;
+
+.bcp-panel {
   background: var(--surface-glass-heavy);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -188,17 +271,16 @@ function onNativeInput(e: Event) {
   border-radius: 1.25rem;
   padding: 1rem;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  width: 16rem;
 }
 
-.presets-grid {
+.bcp-presets-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
-.preset-swatch {
+.bcp-preset-swatch {
   width: 100%;
   aspect-ratio: 1;
   border-radius: 0.5rem;
@@ -219,7 +301,7 @@ function onNativeInput(e: Event) {
   }
 }
 
-.picker-native-row {
+.bcp-native-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -227,13 +309,13 @@ function onNativeInput(e: Event) {
   border-top: 1px solid var(--border-light);
 }
 
-.native-label {
+.bcp-native-label {
   font-size: 0.75rem;
   font-weight: 600;
   color: $text-muted;
 }
 
-.native-input {
+.bcp-native-input {
   width: 2.5rem;
   height: 2rem;
   border-radius: 0.5rem;
@@ -250,17 +332,6 @@ function onNativeInput(e: Event) {
     border: none;
     border-radius: 0.375rem;
   }
-}
-
-.picker-hint {
-  font-size: 0.75rem;
-  color: $text-muted;
-  margin: 0;
-}
-
-.picker-disabled {
-  opacity: 0.45;
-  pointer-events: none;
 }
 
 // Panel transition
