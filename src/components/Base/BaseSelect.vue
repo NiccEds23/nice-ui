@@ -2,6 +2,7 @@
   <div
     class="base-select-wrapper"
     :class="{ 'has-error': error, disabled: disabled }"
+    v-bind="$attrs"
     ref="containerRef"
   >
     <label v-if="label" :for="id" class="input-label">
@@ -104,6 +105,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
+
+// The template has two root nodes (wrapper div + Teleport), so Vue cannot
+// auto-inherit attrs. We disable auto-inheritance and manually bind $attrs
+// to the visible root div so that class/style from parents work correctly.
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
   modelValue: { type: [String, Number, Object, Array], default: "" },
