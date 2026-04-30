@@ -16,53 +16,34 @@
 
     <!-- ── Summary Strip ────────────────────────────────────────── -->
     <div class="summary-strip">
-      <div class="summary-card">
-        <div class="summary-icon today-icon">
-          <span class="material-symbols-outlined">today</span>
-        </div>
-        <div class="summary-content">
-          <div class="summary-value">{{ todayEventsCount }}</div>
-          <div class="summary-label">Today's Events</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-icon week-icon">
-          <span class="material-symbols-outlined">date_range</span>
-        </div>
-        <div class="summary-content">
-          <div class="summary-value">{{ weekEventsCount }}</div>
-          <div class="summary-label">This Week</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-icon upcoming-icon">
-          <span class="material-symbols-outlined">event_upcoming</span>
-        </div>
-        <div class="summary-content">
-          <div class="summary-value summary-value--text">
-            {{ nextEvent ? nextEvent.title : "—" }}
-          </div>
-          <div class="summary-label">
-            {{
-              nextEvent
-                ? nextEvent.startTime + " · " + nextEvent.startDate
-                : "No upcoming events"
-            }}
-          </div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-icon total-icon">
-          <span class="material-symbols-outlined">event_note</span>
-        </div>
-        <div class="summary-content">
-          <div class="summary-value">{{ schedules.length }}</div>
-          <div class="summary-label">Total Events</div>
-        </div>
-      </div>
+      <BaseStatCard
+        :value="todayEventsCount"
+        label="Today's Events"
+        icon="today"
+        variant="primary"
+        :format-value="false"
+      />
+      <BaseStatCard
+        :value="weekEventsCount"
+        label="This Week"
+        icon="date_range"
+        variant="success"
+        :format-value="false"
+      />
+      <BaseStatCard
+        :value="nextEvent ? nextEvent.title : '—'"
+        label="Next Event"
+        icon="event_upcoming"
+        variant="warning"
+        :description="nextEvent ? nextEvent.startTime + ' · ' + nextEvent.startDate : 'No upcoming events'"
+      />
+      <BaseStatCard
+        :value="schedules.length"
+        label="Total Events"
+        icon="event_note"
+        variant="secondary"
+        :format-value="false"
+      />
     </div>
 
     <!-- ── Calendar View ────────────────────────────────────────── -->
@@ -291,7 +272,6 @@ meta:
 
 <style lang="scss" scoped>
 @use "@/assets/styles/variables" as *;
-@use "@/assets/styles/component_mixins" as *;
 
 .calendar-page {
   // padding: 2rem;
@@ -345,86 +325,5 @@ meta:
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
   }
-}
-
-.summary-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.25rem 1.5rem;
-  background: var(--surface-glass-heavy);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
-  border-radius: 1.5rem;
-  transition: transform 0.18s;
-
-  &:hover {
-    transform: translateY(-1px);
-  }
-}
-
-.summary-icon {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.875rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  .material-symbols-outlined {
-    font-size: 1.375rem;
-  }
-
-  &.today-icon {
-    background: color-mix(in srgb, var(--primary-color) 15%, transparent);
-    color: $primary-color;
-  }
-
-  &.week-icon {
-    background: color-mix(in srgb, var(--status-success) 15%, transparent);
-    color: $status-success;
-  }
-
-  &.upcoming-icon {
-    background: color-mix(in srgb, var(--status-warning) 15%, transparent);
-    color: $status-warning;
-  }
-
-  &.total-icon {
-    background: color-mix(in srgb, var(--accent-color) 15%, transparent);
-    color: $accent-color;
-  }
-}
-
-.summary-content {
-  min-width: 0;
-  flex: 1;
-}
-
-.summary-value {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: $text-primary;
-  line-height: 1.2;
-
-  &--text {
-    font-size: 0.9375rem;
-    font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-.summary-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: $text-muted;
-  margin-top: 0.125rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 </style>
