@@ -90,6 +90,11 @@ export const useSidebarStore = defineStore('sidebar', () => {
                     isOpen: false
                 },
                 {
+                    label: 'Calendar',
+                    icon: 'calendar_month',
+                    to: '/calendar'
+                },
+                {
                     label: 'Design System',
                     icon: 'palette',
                     to: '/design-system'

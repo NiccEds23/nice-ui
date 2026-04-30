@@ -461,6 +461,24 @@
               placeholder="Select date range"
             />
 
+            <BaseDatepicker
+              label="Date & Time"
+              v-model="dsDatetime"
+              mode="datetime"
+              placeholder="Select date and time"
+            />
+
+            <div class="h-px bg-light w-full my-2"></div>
+
+            <BaseTimePicker label="Time" v-model="dsTimePicker" />
+            <div class="text-xs text-muted">Value: {{ dsTimePicker }}</div>
+
+            <BaseTimePicker
+              label="Time (15-min steps)"
+              v-model="dsTimePickerStep15"
+              :step="15"
+            />
+
             <div class="h-px bg-light w-full my-2"></div>
 
             <div
@@ -1548,6 +1566,40 @@
         />
       </BaseCard>
     </section>
+
+    <!-- ── BaseCalendarView ──────────────────────────────────────── -->
+    <section class="ds-section">
+      <h2>Calendar View</h2>
+      <p class="text-sm text-muted mb-4">
+        Three-view calendar (Yearly / Monthly / Daily) with schedule management
+        and overlap detection. Click a month to drill down, click a date to see
+        the daily timeline, click an empty time slot to add a schedule.
+      </p>
+      <BaseCalendarView
+        v-model="dsCalendarDate"
+        v-model:schedules="dsCalendarSchedules"
+        v-model:view="dsCalendarView"
+        :start-hour="7"
+        :end-hour="22"
+        :hour-height="64"
+      />
+      <div class="d-flex gap-4 mt-4 text-sm text-muted flex-wrap">
+        <span
+          >Selected:
+          <strong class="text-primary">{{ dsCalendarDate }}</strong></span
+        >
+        <span
+          >View:
+          <strong class="text-primary">{{ dsCalendarView }}</strong></span
+        >
+        <span
+          >Schedules:
+          <strong class="text-primary">{{
+            dsCalendarSchedules.length
+          }}</strong></span
+        >
+      </div>
+    </section>
   </div>
 </template>
 
@@ -1589,6 +1641,10 @@ import BaseStatCard from "@/components/Base/BaseStatCard.vue";
 import BaseKanbanBoard, {
   type KanbanColumn,
 } from "@/components/Base/BaseKanbanBoard.vue";
+import BaseCalendarView, {
+  type CalendarSchedule,
+  type CalendarViewMode,
+} from "@/components/Base/BaseCalendarView.vue";
 
 // ── New component demo state ────────────────────────────────────────────────
 // Textarea
@@ -1803,6 +1859,68 @@ const dsKanbanColumns = ref<KanbanColumn[]>([
         tags: ["ui"],
       },
     ],
+  },
+]);
+
+// ── BaseCalendarView demo state ─────────────────────────────────────────────
+const dsCalendarView = ref<CalendarViewMode>("monthly");
+const dsCalendarDate = ref<string>("2026-04-29");
+const dsCalendarSchedules = ref<CalendarSchedule[]>([
+  {
+    id: "cs1",
+    title: "Team Standup",
+    startDate: "2026-04-29",
+    endDate: "2026-04-29",
+    startTime: "09:00",
+    endTime: "09:30",
+    color: "#3b82f6",
+    description: "Daily sync with engineering team.",
+  },
+  {
+    id: "cs2",
+    title: "Design Review",
+    startDate: "2026-04-29",
+    endDate: "2026-04-29",
+    startTime: "09:15",
+    endTime: "10:15",
+    color: "#8b5cf6",
+    description: "Review new UI components.",
+  },
+  {
+    id: "cs3",
+    title: "Sprint Planning",
+    startDate: "2026-04-29",
+    endDate: "2026-04-29",
+    startTime: "11:00",
+    endTime: "13:00",
+    color: "#22c55e",
+  },
+  {
+    id: "cs4",
+    title: "Client Call",
+    startDate: "2026-04-30",
+    endDate: "2026-04-30",
+    startTime: "14:00",
+    endTime: "15:00",
+    color: "#f59e0b",
+  },
+  {
+    id: "cs5",
+    title: "Code Review",
+    startDate: "2026-05-02",
+    endDate: "2026-05-02",
+    startTime: "10:00",
+    endTime: "11:00",
+    color: "#06b6d4",
+  },
+  {
+    id: "cs6",
+    title: "1:1 with Manager",
+    startDate: "2026-05-05",
+    endDate: "2026-05-05",
+    startTime: "15:00",
+    endTime: "15:30",
+    color: "#ec4899",
   },
 ]);
 
@@ -2098,6 +2216,9 @@ const switches = reactive({
 });
 const dateValue = ref("");
 const dateRangeValue = ref({ start: "", end: "" });
+const dsDatetime = ref("");
+const dsTimePicker = ref("09:30");
+const dsTimePickerStep15 = ref("10:00");
 
 const handleDismiss = () => {
   // alert('Dismissed!');

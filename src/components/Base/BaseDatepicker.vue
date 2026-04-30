@@ -76,6 +76,46 @@
             </span>
           </div>
         </div>
+
+        <!-- DateTime time section -->
+        <template v-if="mode === 'datetime'">
+          <div class="time-section-divider">
+            <span class="material-symbols-outlined">schedule</span>
+            <span class="time-section-title">Select Time</span>
+          </div>
+          <div class="dt-time-columns">
+            <div class="dt-time-col" ref="hourColRef">
+              <div
+                v-for="h in 24"
+                :key="h"
+                class="dt-time-item"
+                :class="{ selected: selectedHour === h - 1 }"
+                @click.stop="selectHour(h - 1)"
+              >{{ String(h - 1).padStart(2, '0') }}</div>
+            </div>
+            <div class="dt-sep">:</div>
+            <div class="dt-time-col" ref="minColRef">
+              <div
+                v-for="m in minuteOptions"
+                :key="m"
+                class="dt-time-item"
+                :class="{ selected: selectedMinute === m }"
+                @click.stop="selectMinute(m)"
+              >{{ String(m).padStart(2, '0') }}</div>
+            </div>
+          </div>
+          <div class="dt-confirm-row">
+            <span class="dt-preview">
+              {{ selectedStart ? formatDate(selectedStart) : 'Select a date' }}
+              &middot; {{ String(selectedHour).padStart(2, '0') }}:{{ String(selectedMinute).padStart(2, '0') }}
+            </span>
+            <BaseButton
+              size="sm"
+              :disabled="!selectedStart"
+              @click.stop="confirmDatetime"
+            >Confirm</BaseButton>
+          </div>
+        </template>
       </div>
     </Transition>
 
@@ -84,7 +124,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 
 const props = defineProps({
   modelValue: { type: [String, Object, Array], default: null }, // String (ISO) or { start, end }
@@ -94,6 +133,7 @@ const props = defineProps({
   error: { type: String, default: "" },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
+  mode: { type: String, default: "date" }, // 'date' | 'datetime'
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -104,6 +144,13 @@ const today = new Date();
 const currentMonth = ref(today.getMonth());
 const currentYear = ref(today.getFullYear());
 const hoveredDate = ref<Date | null>(null);
+
+// Time state (used in datetime mode)
+const selectedHour = ref(9);
+const selectedMinute = ref(0);
+const hourColRef = ref<HTMLElement | null>(null);
+const minColRef = ref<HTMLElement | null>(null);
+const minuteOptions = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 
 const weekDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const monthNames = [
@@ -152,7 +199,17 @@ watch(
     } else {
       // Single mode
       if (typeof val === "string") {
-        selectedStart.value = parseLocalDate(val);
+        if (props.mode === "datetime" && val.includes(" ")) {
+          const [datePart, timePart] = val.split(" ");
+          selectedStart.value = parseLocalDate(datePart ?? "");
+          if (timePart) {
+            const parts = timePart.split(":").map(Number);
+            selectedHour.value = parts[0] ?? 9;
+            selectedMinute.value = parts[1] ?? 0;
+          }
+        } else {
+          selectedStart.value = parseLocalDate(val);
+        }
       }
     }
   },
@@ -167,7 +224,12 @@ const displayValue = computed(() => {
       return `${formatDate(selectedStart.value)} - Select end date`;
     }
   } else {
-    if (selectedStart.value) return formatDate(selectedStart.value);
+    if (selectedStart.value) {
+      if (props.mode === "datetime") {
+        return `${formatDate(selectedStart.value)} · ${String(selectedHour.value).padStart(2, "0")}:${String(selectedMinute.value).padStart(2, "0")}`;
+      }
+      return formatDate(selectedStart.value);
+    }
   }
   return "";
 });
@@ -200,6 +262,12 @@ const calendarDays = computed(() => {
 const toggleDropdown = () => {
   if (props.disabled) return;
   isOpen.value = !isOpen.value;
+  if (isOpen.value && props.mode === "datetime") {
+    nextTick(() => {
+      scrollColTo(hourColRef.value, selectedHour.value);
+      scrollColTo(minColRef.value, minuteOptions.indexOf(selectedMinute.value));
+    });
+  }
 };
 
 const closeDropdown = () => {
@@ -250,8 +318,10 @@ const selectDate = (date: Date) => {
   } else {
     // Single mode
     selectedStart.value = date;
-    emitUpdate();
-    closeDropdown();
+    if (props.mode !== "datetime") {
+      emitUpdate();
+      closeDropdown();
+    }
   }
 };
 
@@ -269,6 +339,13 @@ const emitUpdate = () => {
       start: selectedStart.value ? formatToIsoDate(selectedStart.value) : "",
       end: selectedEnd.value ? formatToIsoDate(selectedEnd.value) : "",
     });
+  } else if (props.mode === "datetime") {
+    if (selectedStart.value) {
+      const timeStr = `${String(selectedHour.value).padStart(2, "0")}:${String(selectedMinute.value).padStart(2, "0")}`;
+      emit("update:modelValue", `${formatToIsoDate(selectedStart.value)} ${timeStr}`);
+    } else {
+      emit("update:modelValue", "");
+    }
   } else {
     emit(
       "update:modelValue",
@@ -280,6 +357,8 @@ const emitUpdate = () => {
 const clearValue = () => {
   selectedStart.value = null;
   selectedEnd.value = null;
+  selectedHour.value = 9;
+  selectedMinute.value = 0;
   emit("update:modelValue", null);
 };
 
@@ -362,6 +441,28 @@ const isHoverEnd = (date: Date) => {
     hoveredDate.value > selectedStart.value
   );
 };
+
+// DateTime helpers
+function scrollColTo(el: HTMLElement | null, idx: number) {
+  if (!el || idx < 0) return;
+  const item = el.children[idx] as HTMLElement | undefined;
+  if (item) el.scrollTop = item.offsetTop - el.clientHeight / 2 + item.clientHeight / 2;
+}
+
+function selectHour(h: number) {
+  selectedHour.value = h;
+  nextTick(() => scrollColTo(hourColRef.value, h));
+}
+
+function selectMinute(m: number) {
+  selectedMinute.value = m;
+  nextTick(() => scrollColTo(minColRef.value, minuteOptions.indexOf(m)));
+}
+
+function confirmDatetime() {
+  emitUpdate();
+  closeDropdown();
+}
 
 // Outside Click
 const handleClickOutside = (event: MouseEvent) => {
@@ -613,5 +714,103 @@ onUnmounted(() => {
   font-size: 0.75rem;
   color: $status-danger;
   margin-left: 0.25rem;
+}
+
+// ── DateTime extras ──────────────────────────────────────────────
+.time-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0 0.5rem;
+  border-top: 1px solid var(--border-light);
+  margin-top: 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $text-muted;
+
+  .material-symbols-outlined {
+    font-size: 0.875rem;
+  }
+
+  .time-section-title {
+    flex: 1;
+  }
+}
+
+.dt-time-columns {
+  display: flex;
+  align-items: stretch;
+  height: 148px;
+  border: 1px solid var(--border-light);
+  border-radius: 0.875rem;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface-glass) 40%, transparent);
+}
+
+.dt-time-col {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.25rem 0;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.dt-sep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: $text-muted;
+  padding: 0 0.25rem;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.dt-time-item {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $text-primary;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 0.375rem;
+  margin: 1px 3px;
+  line-height: 1;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: $primary-color;
+  }
+
+  &.selected {
+    background: $primary-color;
+    color: white;
+    font-weight: 700;
+  }
+}
+
+.dt-confirm-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.dt-preview {
+  font-size: 0.75rem;
+  color: $text-secondary;
+  font-weight: 600;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

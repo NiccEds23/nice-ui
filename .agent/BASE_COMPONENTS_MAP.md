@@ -19,12 +19,13 @@ Use these components to build all UI interfaces.
 - **BaseCheckbox**: `modelValue` (Boolean or Array), `value` (for array mode), `label`.
 - **BaseSwitch**: `label`, `disabled`. Toggle switch.
 - **BaseRadio**: `modelValue`, `value`, `label`, `disabled`. Single radio button with animated indicator.
-- **BaseDatepicker**: `range` (boolean), `placeholder`.
+- **BaseDatepicker**: `modelValue` (ISO string in single/datetime mode; `{ start, end }` object in range mode), `mode` (`'date'` | `'datetime'`, default `'date'`), `range` (boolean), `label`, `placeholder`, `error`, `required`, `disabled`. In `datetime` mode keeps dropdown open until "Confirm" clicked and emits `'YYYY-MM-DD HH:mm'`. In `range` mode emits `{ start: string, end: string }`.
 - **BaseUpload**: `mode` (field/button), `accept`, `preview`. Single file.
 - **BaseUploadMultiple**: `maxFiles`, `preview`. Multiple files with list view.
 - **BaseRating**: `modelValue` (0–5), `max`, `size`, `variant`, `readonly`, `halfStar`, `showValue`, `label`.
 - **BaseOtpInput**: `modelValue`, `length` (4/6), `inputType`, `size`, `masked`, `disabled`, `label`, `error`, `hint`. Emits: `complete`.
 - **BaseColorPicker**: `modelValue` (hex), `presets` (string[]), `disabled`, `label`, `hint`. Panel with swatch grid + native fallback.
+- **BaseTimePicker**: `modelValue` (HH:mm), `label`, `placeholder`, `error`, `required`, `disabled`, `step` (minute increment, default 5). Scrollable hour/minute column picker.
 
 ## Data Display
 
@@ -40,6 +41,7 @@ Use these components to build all UI interfaces.
 - **BaseAccordion**: `items` (AccordionItem[]), `multiple`, `defaultOpen`, `flush`. Slot per item: `item-[key]`.
 - **BaseTimeline**: `items` (TimelineItem[]), `variant` (default/compact). Slots: `icon-[key]`, `content-[key]`.
 - **BaseKanbanBoard**: `columns` (KanbanColumn[]), `compact`. Emits: `move-card`, `update:columns`. Supports drag-and-drop.
+- **BaseCalendarView**: `modelValue` (selected date `YYYY-MM-DD`, `v-model`), `schedules` (`CalendarSchedule[]`, `v-model:schedules`), `view` (`yearly`/`monthly`/`daily`, `v-model:view`), `startHour`, `endHour`, `hourHeight`, `readonly`. Three-view calendar with schedule CRUD and overlap detection. `CalendarSchedule` uses `startDate`/`endDate` for multi-day event support. Delete action is an ✕ button on each chip/event block that opens a confirmation modal (not a button in the edit form). Exports: `CalendarSchedule`, `CalendarViewMode`.
 
 ## Charts & Visualization
 

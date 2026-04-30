@@ -1,6 +1,6 @@
 # 02. Base Components — Developer Reference
 
-> **Location**: `src/components/Base/` | **Total**: 45 components
+> **Location**: `src/components/Base/` | **Total**: 47 components
 > **Design System preview**: `http://localhost:5173/design-system`
 
 All Base Components must be used **instead of raw HTML elements**. See `CODING_RULES.md §3` for the full replacement table.
@@ -12,13 +12,14 @@ All Base Components must be used **instead of raw HTML elements**. See `CODING_R
 1. [Core UI](#-core-ui)
 2. [Forms & Inputs](#-forms--inputs)
 3. [Data Display](#-data-display)
-4. [Charts](#-charts)
-5. [Navigation](#-navigation)
-6. [Progress & Feedback](#-progress--feedback)
-7. [Overlays & Floating UI](#-overlays--floating-ui)
-8. [Layout](#-layout)
-9. [Audit & Activity](#-audit--activity)
-10. [Type Exports Reference](#-type-exports-reference)
+4. [Calendar](#-calendar)
+5. [Charts](#-charts)
+6. [Navigation](#-navigation)
+7. [Progress & Feedback](#-progress--feedback)
+8. [Overlays & Floating UI](#-overlays--floating-ui)
+9. [Layout](#-layout)
+10. [Audit & Activity](#-audit--activity)
+11. [Type Exports Reference](#-type-exports-reference)
 
 ---
 
@@ -317,24 +318,50 @@ All Base Components must be used **instead of raw HTML elements**. See `CODING_R
 
 ### `BaseDatepicker`
 
-**Use for**: Date input with calendar popup. Supports single date and date range.
+**Use for**: Date input with calendar popup. Supports single date, date range, and datetime (date + time) selection.
 
-| Prop          | Type           | Default | Notes                                       |
-| ------------- | -------------- | ------- | ------------------------------------------- |
-| `modelValue`  | `String/Array` | —       | ISO date string or `[start, end]` for range |
-| `label`       | `String`       | `""`    | —                                           |
-| `placeholder` | `String`       | `""`    | —                                           |
-| `range`       | `Boolean`      | `false` | Enables range selection mode                |
-| `error`       | `String`       | `""`    | —                                           |
-| `disabled`    | `Boolean`      | `false` | —                                           |
+| Prop          | Type            | Default   | Notes                                                                          |
+| ------------- | --------------- | --------- | ------------------------------------------------------------------------------ |
+| `modelValue`  | `String/Object` | —         | ISO date `'YYYY-MM-DD'` in single/datetime mode; `{ start: string, end: string }` in range mode; `v-model` |
+| `label`       | `String`        | `""`      | —                                                                              |
+| `placeholder` | `String`        | `""`      | —                                                                              |
+| `mode`        | `String`        | `"date"`  | `date` (date only) or `datetime` (date + inline scrollable time picker; emits `'YYYY-MM-DD HH:mm'`) |
+| `range`       | `Boolean`       | `false`   | Enables range selection; emits `{ start: string, end: string }`                |
+| `error`       | `String`        | `""`      | —                                                                              |
+| `required`    | `Boolean`       | `false`   | Shows `*` on label                                                             |
+| `disabled`    | `Boolean`       | `false`   | —                                                                              |
 
 ```vue
-<BaseDatepicker
-  v-model="birthDate"
-  label="Date of Birth"
-  placeholder="Select date"
-/>
+<!-- Single date -->
+<BaseDatepicker v-model="birthDate" label="Date of Birth" placeholder="Select date" />
+
+<!-- Range mode (emits { start, end }) -->
 <BaseDatepicker v-model="dateRange" label="Report Period" range />
+
+<!-- DateTime mode (emits 'YYYY-MM-DD HH:mm'; dropdown stays open until Confirm) -->
+<BaseDatepicker v-model="meetingAt" label="Scheduled At" mode="datetime" />
+```
+
+---
+
+### `BaseTimePicker`
+
+**Use for**: Time-only input with a scrollable hour/minute column picker (24-hour format).
+
+| Prop          | Type      | Default | Notes                                              |
+| ------------- | --------- | ------- | -------------------------------------------------- |
+| `modelValue`  | `String`  | `""`    | 24-hour time string `'HH:mm'`; `v-model`           |
+| `label`       | `String`  | `""`    | —                                                  |
+| `placeholder` | `String`  | `""`    | —                                                  |
+| `error`       | `String`  | `""`    | —                                                  |
+| `required`    | `Boolean` | `false` | Shows `*` on label                                 |
+| `disabled`    | `Boolean` | `false` | —                                                  |
+| `step`        | `Number`  | `5`     | Minute increment (e.g. `15` shows 00, 15, 30, 45)  |
+
+```vue
+<BaseTimePicker v-model="startTime" label="Start Time" />
+<BaseTimePicker v-model="endTime" label="End Time" :step="15" />
+<BaseTimePicker v-model="reminder" label="Reminder at" :step="30" required />
 ```
 
 ---
@@ -849,6 +876,99 @@ interface KanbanColumn {
 
 ```vue
 <BaseKanbanBoard v-model:columns="boardColumns" @move-card="onCardMoved" />
+```
+
+---
+
+## 📅 Calendar
+
+### `BaseCalendarView`
+
+**Use for**: Full-featured calendar widget on scheduling pages, event management, leave calendars, and booking flows. Supports three switchable views with built-in schedule CRUD and visual overlap detection.
+
+| Prop         | Type                  | Default     | Notes                                        |
+| ------------ | --------------------- | ----------- | -------------------------------------------- |
+| `modelValue` | `String`              | today       | Selected date `YYYY-MM-DD`; `v-model`        |
+| `schedules`  | `CalendarSchedule[]`  | `[]`        | Schedule array; `v-model:schedules`          |
+| `view`       | `CalendarViewMode`    | `'monthly'` | Active view; `v-model:view`                  |
+| `startHour`  | `Number`              | `0`         | First hour shown in daily timeline (0–23)    |
+| `endHour`    | `Number`              | `24`        | Last exclusive hour in daily timeline (1–24) |
+| `hourHeight` | `Number`              | `64`        | Pixel height per hour row in daily view      |
+| `readonly`   | `Boolean`             | `false`     | Hides add/edit/delete actions                |
+
+**Emits**: `update:modelValue`, `update:schedules`, `update:view`
+
+**Views**:
+- **Yearly** — 4×3 grid of 12 mini-month calendars. Prev/Next changes the year. Click any month to open Monthly view.
+- **Monthly** — Full calendar grid with schedule chips per cell (max 3 visible + "+N more"). Multi-day events show an `→` icon. Overlapping events show a dashed left border indicator. Click a date to open Daily view. Prev/Next changes the month.
+- **Daily** — Hourly timeline with schedule blocks positioned by exact start/end time. Multi-day events are time-clamped per day (first day uses `startTime`, last day uses `endTime`, middle days span the full visible range). Overlapping events are displayed side-by-side (Google Calendar style). Click an empty time slot to add a schedule. Prev/Next changes the day. A red "now" line shows current time.
+
+**Delete UX**: Each schedule chip (monthly view) and event block (daily view) has an ✕ button. Clicking it opens a confirmation modal before deleting. There is no Delete button inside the edit form.
+
+**`CalendarSchedule` interface**:
+
+```ts
+import type {
+  CalendarSchedule,
+  CalendarViewMode,
+} from "@/components/Base/BaseCalendarView.vue";
+
+interface CalendarSchedule {
+  id: string;
+  title: string;
+  description?: string;
+  startDate: string;  // YYYY-MM-DD — start day (inclusive)
+  endDate: string;    // YYYY-MM-DD — end day (inclusive; same as startDate for single-day events)
+  startTime: string;  // HH:mm (24h)
+  endTime: string;    // HH:mm (24h)
+  color?: string;     // hex color (auto-assigned from palette if omitted)
+}
+
+type CalendarViewMode = "yearly" | "monthly" | "daily";
+```
+
+```vue
+<!-- Minimal usage -->
+<BaseCalendarView v-model:schedules="events" />
+
+<!-- Full controlled usage -->
+<BaseCalendarView
+  v-model="selectedDate"
+  v-model:schedules="events"
+  v-model:view="calView"
+  :start-hour="7"
+  :end-hour="22"
+  :hour-height="64"
+/>
+
+<!-- Read-only display -->
+<BaseCalendarView :schedules="events" readonly />
+```
+
+**Multi-day event example**:
+
+```ts
+const events = ref<CalendarSchedule[]>([
+  // Single-day event
+  {
+    id: "ev-1",
+    title: "Team Standup",
+    startDate: "2026-04-29",
+    endDate: "2026-04-29",
+    startTime: "09:00",
+    endTime: "09:30",
+  },
+  // Multi-day event (spans 3 days)
+  {
+    id: "ev-2",
+    title: "Tech Conference",
+    startDate: "2026-05-05",
+    endDate: "2026-05-07",
+    startTime: "09:00",
+    endTime: "18:00",
+    color: "#06b6d4",
+  },
+]);
 ```
 
 ---
@@ -1382,4 +1502,9 @@ import BaseKanbanBoard, {
 import BaseAuditLog, {
   type AuditLogEntry,
 } from "@/components/Base/BaseAuditLog.vue";
+import type {
+  CalendarSchedule,
+  CalendarViewMode,
+} from "@/components/Base/BaseCalendarView.vue";
+// BaseTimePicker and BaseDatepicker export no standalone types
 ```
