@@ -1491,7 +1491,10 @@
       <h2>Stat Card</h2>
       <div
         class="d-grid"
-        style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))"
+        style="
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 1rem;
+        "
       >
         <BaseStatCard
           label="Total Revenue"

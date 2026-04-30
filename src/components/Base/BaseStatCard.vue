@@ -124,14 +124,17 @@ const sparkPoints = computed(() => {
   border: 1px solid var(--border-light);
   background: var(--surface-white);
   transition: all 0.2s;
+  overflow: hidden;
 
   &.stat-clickable {
     cursor: pointer;
+    position: relative;
 
     &:hover {
       border-color: $primary-color;
       box-shadow: 0 4px 20px rgba($primary-rgb, 0.1);
       transform: translateY(-2px);
+      z-index: 1;
     }
   }
 }
@@ -237,6 +240,8 @@ const sparkPoints = computed(() => {
   display: flex;
   align-items: baseline;
   gap: 0.375rem;
+  flex-wrap: wrap;
+  overflow: hidden;
 }
 
 .stat-value {
@@ -245,6 +250,8 @@ const sparkPoints = computed(() => {
   color: $text-primary;
   line-height: 1.1;
   letter-spacing: -0.02em;
+  word-break: break-all;
+  min-width: 0;
 }
 
 .stat-suffix {
