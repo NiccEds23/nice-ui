@@ -253,6 +253,7 @@ const formatSize = (bytes: number) => {
     .image-preview-wrapper {
         width: 7rem;
         height: 7rem;
+        flex-shrink: 0;
         border-radius: 0.5rem;
         overflow: hidden;
         border: 1px solid $neutral-200;
@@ -285,15 +286,25 @@ const formatSize = (bytes: number) => {
     
     .file-info {
       flex: 1;
+      min-width: 0;
       text-align: left;
-      
-      .file-name { font-weight: 600; color: $text-primary; font-size: 0.875rem; } // #1e293b
-      .file-size { font-size: 0.75rem; color: $text-secondary; } // #64748b
+      overflow: hidden;
+
+      .file-name {
+        font-weight: 600;
+        color: $text-primary;
+        font-size: 0.875rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .file-size { font-size: 0.75rem; color: $text-secondary; }
     }
-    
+
     .remove-btn {
-      background: rgba($status-danger, 0.1); // rgba(239, 68, 68, 0.1)
-      color: $status-danger; // #ef4444
+      flex-shrink: 0;
+      background: rgba($status-danger, 0.1);
+      color: $status-danger;
       border: none;
       width: 2rem;
       height: 2rem;

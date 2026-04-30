@@ -481,22 +481,18 @@
 
             <div class="h-px bg-light w-full my-2"></div>
 
-            <div
-              class="d-grid gap-4 w-full"
-              style="grid-template-columns: 1fr 1fr"
-            >
-              <BaseUpload
-                label="Profile"
-                v-model="uploadedFile"
-                accept="image/*"
-              />
-              <BaseUpload
-                mode="button"
-                label="Import"
-                v-model="importFile"
-                accept=".csv,.xlsx"
-              />
-            </div>
+            <BaseUpload
+              mode="button"
+              label="Import"
+              v-model="importFile"
+              accept=".csv,.xlsx"
+            />
+
+            <BaseUpload
+              label="Profile"
+              v-model="uploadedFile"
+              accept="image/*"
+            />
 
             <BaseUploadMultiple
               label="Document Gallery"
