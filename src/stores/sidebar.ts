@@ -95,6 +95,11 @@ export const useSidebarStore = defineStore('sidebar', () => {
                     to: '/calendar'
                 },
                 {
+                    label: 'Kanban',
+                    icon: 'view_kanban',
+                    to: '/kanban'
+                },
+                {
                     label: 'Design System',
                     icon: 'palette',
                     to: '/design-system'

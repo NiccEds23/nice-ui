@@ -36,6 +36,7 @@
           draggable="true"
           @dragstart="onDragStart($event, card.id, col.key)"
           @dragend="dragging = null"
+          @click="openDetail(card, col)"
         >
           <slot name="card" :card="card" :col="col">
             <!-- Default card layout -->
@@ -83,12 +84,65 @@
       </div>
     </div>
   </div>
+
+  <!-- ── Card Detail Modal ──────────────────────────────────────────────── -->
+  <BaseModal v-model:visible="detailVisible" size="md">
+    <template #header>
+      <div v-if="selectedCard" class="card-detail-header">
+        <span class="card-title">{{ selectedCard.title }}</span>
+      </div>
+    </template>
+    <div v-if="selectedCard" class="card-detail">
+      <!-- Priority + tags -->
+      <div
+        v-if="selectedCard.priority || selectedCard.tags?.length"
+        class="detail-badges"
+      >
+        <BaseBadge
+          v-if="selectedCard.priority"
+          :variant="priorityVariant(selectedCard.priority)"
+          size="sm"
+          pill
+          >{{ selectedCard.priority }}</BaseBadge
+        >
+        <BaseBadge
+          v-for="tag in selectedCard.tags"
+          :key="tag"
+          variant="neutral"
+          size="sm"
+          >{{ tag }}</BaseBadge
+        >
+      </div>
+      <!-- Meta -->
+      <div class="detail-meta">
+        <div v-if="selectedCardCol" class="detail-meta-item">
+          <span class="material-symbols-outlined">view_kanban</span>
+          {{ selectedCardCol.title }}
+        </div>
+        <div v-if="selectedCard.assignee" class="detail-meta-item">
+          <span class="material-symbols-outlined">person</span>
+          {{ selectedCard.assignee }}
+        </div>
+        <div v-if="selectedCard.dueDate" class="detail-meta-item">
+          <span class="material-symbols-outlined">calendar_today</span>
+          {{ selectedCard.dueDate }}
+        </div>
+      </div>
+      <!-- Description -->
+      <p v-if="selectedCard.description" class="detail-desc">
+        {{ selectedCard.description }}
+      </p>
+      <p v-else class="detail-no-desc">No description provided.</p>
+    </div>
+    <!-- <template #footer>
+      <BaseButton block variant="ghost" @click="detailVisible = false"
+        >Close</BaseButton
+      >
+    </template> -->
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import BaseBadge from "./BaseBadge.vue";
-
 export interface KanbanCard {
   id: string;
   title: string;
@@ -123,6 +177,17 @@ const emit = defineEmits<{
 
 const dragging = ref<string | null>(null);
 let dragSource = { cardId: "", colKey: "" };
+
+const detailVisible = ref(false);
+const selectedCard = ref<KanbanCard | null>(null);
+const selectedCardCol = ref<KanbanColumn | null>(null);
+
+function openDetail(card: KanbanCard, col: KanbanColumn) {
+  if (dragging.value) return;
+  selectedCard.value = card;
+  selectedCardCol.value = col;
+  detailVisible.value = true;
+}
 
 function onDragStart(e: DragEvent, cardId: string, colKey: string) {
   dragging.value = cardId;
@@ -332,5 +397,50 @@ function priorityVariant(p: string): "danger" | "warning" | "info" | "neutral" {
   .kanban-card {
     padding: 0.625rem;
   }
+}
+
+.card-detail-header {
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-primary;
+    text-align: start;
+  }
+}
+.detail-badges {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+.detail-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.detail-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  color: $text-muted;
+}
+
+.detail-desc {
+  text-align: start;
+  font-size: 0.8125rem;
+  color: $text-secondary;
+  margin: 0 0 1rem;
+}
+
+.detail-no-desc {
+  font-size: 0.8125rem;
+  color: $text-muted;
+  margin: 0 0 1rem;
+  font-style: italic;
 }
 </style>

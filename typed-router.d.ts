@@ -51,6 +51,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/kanban': RouteRecordInfo<
+      '/kanban',
+      '/kanban',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/login': RouteRecordInfo<
       '/login',
       '/login',
@@ -92,6 +99,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/form-demo.vue': {
       routes:
         | '/form-demo'
+      views:
+        | never
+    }
+    'src/pages/kanban.vue': {
+      routes:
+        | '/kanban'
       views:
         | never
     }
