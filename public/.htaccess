@@ -1,0 +1,70 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Apache configuration for Vue 3 SPA on shared hosting
+# Place this file at the document root (same level as index.html).
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── SPA Routing ──────────────────────────────────────────────────────────────
+# Vue Router uses HTML5 history mode. Without this block, refreshing any URL
+# other than "/" returns a 404 from Apache because no matching file exists.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Serve the file directly if it physically exists (JS/CSS/images/fonts)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Everything else → index.html (Vue Router handles the rest client-side)
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# ── Gzip / Deflate Compression ────────────────────────────────────────────────
+# Reduces transfer size by 60–80% for text-based assets.
+# Most shared hosts already enable this server-wide, but declaring it here
+# guarantees compression even on hosts where it is opt-in.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE font/woff2
+</IfModule>
+
+# ── Cache-Control Headers ─────────────────────────────────────────────────────
+# Vite fingerprints all JS/CSS/font filenames (e.g. vue-vendor.a1b2c3d4.js),
+# so "immutable" 1-year caching is safe for those assets.
+# index.html must NEVER be cached — it is the entry point that references the
+# new fingerprinted filenames after every deploy.
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Fingerprinted static assets — browsers cache for 1 year, never revalidate
+  <FilesMatch "\.(js|css|woff|woff2|ttf|eot|svg|ico|png|jpg|jpeg|webp|avif)$">
+    ExpiresDefault "access plus 1 year"
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Entry point — must always be re-fetched so new asset hashes are picked up
+  <FilesMatch "^index\.html$">
+    ExpiresDefault "access plus 0 seconds"
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+  </FilesMatch>
+</IfModule>
+
+# ── Security Headers ──────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  # Prevent this site from being embedded in an iframe on another domain
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Prevent browsers from MIME-sniffing a response away from declared Content-Type
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Only send the origin as referrer for cross-origin requests
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Disable browser features not used by this app
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>

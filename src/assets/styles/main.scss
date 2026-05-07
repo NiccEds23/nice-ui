@@ -21,10 +21,19 @@ body {
   margin: 0;
   padding: 0;
   font-family: $font-family-base;
-  background: $bg-gradient;
-  background-attachment: fixed;
   color: $text-primary;
   -webkit-font-smoothing: antialiased;
+
+  // background-attachment: fixed causes a CPU repaint on every scroll frame.
+  // A position:fixed pseudo-element achieves the same visual effect via
+  // GPU compositing instead, with no repaint cost.
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: $bg-gradient;
+  }
 }
 
 // ── Scrollbar tokens ────────────────────────────────────────────────────────

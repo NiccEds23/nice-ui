@@ -347,3 +347,69 @@ import BaseKanbanBoard, {
   type KanbanColumn,
 } from '@/components/Base/BaseKanbanBoard.vue';
 ```
+
+---
+
+## 9. Performance Rules 🚀
+
+### 9.1 Always Use Lazy Route Loading
+
+`unplugin-vue-router` is configured with `importMode: 'async'` in `vite.config.ts`. Every page in `src/pages/` is automatically split into its own async chunk. **Do NOT override this per-route.** Never use synchronous page imports.
+
+### 9.2 No console.log in Production Code
+
+`console.*` and `debugger` are dropped at build time via `esbuild.drop` in `vite.config.ts`. Do not rely on console statements surviving the production build. For dev-only logging, wrap in a guard:
+
+```ts
+if (import.meta.env.DEV) {
+  console.log('debug only:', data);
+}
+```
+
+### 9.3 `background-attachment: fixed` is Forbidden
+
+It forces a CPU repaint on every scroll frame. Use the `body::before` pattern instead:
+
+```scss
+// ❌ Repaint on every scroll
+body { background: $bg-gradient; background-attachment: fixed; }
+
+// ✅ GPU compositing — no scroll repaint cost
+body {
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: $bg-gradient;
+  }
+}
+```
+
+### 9.4 Hoist Long-Lived Object Constructors
+
+If a constructor is called inside `computed()` or a render function and the result depends only on static config, hoist it to module scope so it is created once:
+
+```ts
+// ❌ New instance on every reactive update
+const fmt = computed(() => new Intl.NumberFormat('id-ID').format(val.value));
+
+// ✅ One instance per app lifetime
+const _formatter = new Intl.NumberFormat('id-ID');
+const fmt = computed(() => _formatter.format(val.value));
+```
+
+Applies to: `Intl.NumberFormat`, `Intl.DateTimeFormat`, regex with `/g` flag, static `Map`/`Set` lookups.
+
+### 9.5 v-if for Modals, v-show for Frequent Toggles
+
+- `<BaseModal>`, `<BaseDrawer>`, `<BasePopover>` → always controlled with `v-if` (their implementations enforce this). DOM is destroyed when hidden.
+- **Tabs, accordion panels, content toggled many times per session** → prefer `v-show` to avoid repeated mount/unmount costs.
+
+### 9.6 New Heavy Dependencies → Evaluate Chunk Placement
+
+If adding an npm package larger than ~50 KB, check whether it should be extracted into a vendor chunk in `manualChunks` (`vite.config.ts`). Libraries that change less frequently than application code benefit from long-term browser caching when separated.
+
+### 9.7 Deploy to Shared Hosting via `public/.htaccess`
+
+`public/.htaccess` must always be present. It provides SPA routing (required for Vue Router history mode), 1-year immutable cache on fingerprinted assets, `no-cache` on `index.html`, gzip, and security headers. See `documentation/08_PERFORMANCE.md` for the full deployment checklist.

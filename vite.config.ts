@@ -7,7 +7,7 @@ import { VueRouterAutoImports } from "unplugin-vue-router";
 import path from "path";
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -15,7 +15,8 @@ export default defineConfig({
   },
   plugins: [
     VueRouter({
-      /* options */
+      // Each page becomes a separate async chunk — only downloaded when the route is visited.
+      importMode: "async",
     }),
     vue(),
     AutoImport({
@@ -34,21 +35,32 @@ export default defineConfig({
       dts: "src/components.d.ts",
     }),
   ],
+
+  // Strip console.* and debugger statements in production builds at the esbuild
+  // transform stage — no source changes needed.
+  esbuild: {
+    drop: mode === "production" ? (["console", "debugger"] as const) : [],
+  },
+
   build: {
     // Modern output — no IE11 polyfills
     target: "esnext",
 
-    // Warn when any single chunk exceeds 1MB (gzipped it will be ~250KB)
+    // Sourcemaps expose original source code on the server.
+    // Only generate them during development / CI; never ship them to production.
+    sourcemap: mode !== "production",
+
+    // Warn when any single chunk exceeds 1 MB (gzipped it will be ~250 KB)
     chunkSizeWarningLimit: 1000,
 
     rollupOptions: {
       output: {
         /**
          * Manual chunk splitting strategy:
-         *  - vue-vendor  : Vue core (rarely changes — long cache TTL)
-         *  - echarts     : ECharts 2D (rarely changes — long cache TTL)
-         *  - ui-vendor   : Other heavy UI libs (grid-layout-plus, maska)
-         *  - app code    : Changes every deploy — separate from vendor cache
+         *  - vue-vendor    : Vue core (rarely changes — long cache TTL)
+         *  - echarts-vendor: ECharts 2D (rarely changes — long cache TTL)
+         *  - ui-vendor     : Other heavy UI libs (grid-layout-plus, maska)
+         *  - page chunks   : One chunk per route via importMode:'async' (auto)
          *
          * echarts-gl (3D) is NOT included here because it is loaded
          * dynamically via import() only when `is3d` prop is true.
@@ -91,4 +103,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

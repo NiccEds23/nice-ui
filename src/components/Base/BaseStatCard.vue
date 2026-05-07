@@ -56,7 +56,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+// Hoisted to module scope — one instance shared across all BaseStatCard
+// instances for the app's lifetime instead of re-creating on every render.
+const _formatter = new Intl.NumberFormat("id-ID");
 
 const props = withDefaults(
   defineProps<{
@@ -93,7 +95,7 @@ const sparkHeight = 28;
 const formattedValue = computed(() => {
   if (typeof props.value === "string") return props.value;
   if (!props.formatValue) return String(props.value);
-  return new Intl.NumberFormat("id-ID").format(props.value);
+  return _formatter.format(props.value as number);
 });
 
 const sparkPoints = computed(() => {
